@@ -1,36 +1,32 @@
 package com.example.chargescheduler.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.chargescheduler.data.Repository.SampleDataRepository
 import com.example.chargescheduler.domain.scheduler.ChargingSchedule
 import com.example.chargescheduler.domain.scheduler.ChargingSchedulerAlgorithm
 import com.example.chargescheduler.domain.usecase.GetAvailableHoursUseCase
 import com.example.chargescheduler.domain.usecase.GetChargerUseCase
 import com.example.chargescheduler.domain.usecase.GetTruckUseCase
 import com.example.chargescheduler.presentation.model.ChargingUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChargingViewModel() : ViewModel() {
+@HiltViewModel
+class ChargingViewModel @Inject constructor(
+    private val getAvailableHoursUseCase: GetAvailableHoursUseCase,
+    private val getChargerUseCase: GetChargerUseCase,
+    private val getTruckUseCase: GetTruckUseCase,
+    private val scheduler: ChargingSchedulerAlgorithm
+) : ViewModel() {
 
-    private val repository: SampleDataRepository = SampleDataRepository()
-
-    private val getAvailableHoursUseCase = GetAvailableHoursUseCase(repository)
-
-    private val getChargerUseCase = GetChargerUseCase(repository)
-
-    private val getTruckUseCase = GetTruckUseCase(repository)
-
-    private val scheduler = ChargingSchedulerAlgorithm()
     private val _uiState = MutableStateFlow(ChargingUiState())
-    val uiState: StateFlow<ChargingUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<ChargingUiState> = _uiState
 
     private val _schedule = MutableStateFlow<ChargingSchedule?>(null)
     val schedule: StateFlow<ChargingSchedule?> = _schedule
@@ -46,7 +42,6 @@ class ChargingViewModel() : ViewModel() {
                 getChargerUseCase.execute(),
                 getTruckUseCase.execute()
             ) { hours, chargers, trucks ->
-
                 Triple(hours, chargers, trucks)
             }
                 .distinctUntilChanged()
@@ -57,7 +52,6 @@ class ChargingViewModel() : ViewModel() {
                     )
                 }
                 .collect { (hours, chargers, trucks) ->
-
                     val schedule = scheduler.createSchedule(
                         trucks = trucks,
                         chargers = chargers,
@@ -70,7 +64,6 @@ class ChargingViewModel() : ViewModel() {
                         trucks = trucks,
                         isLoading = false
                     )
-
                 }
         }
     }

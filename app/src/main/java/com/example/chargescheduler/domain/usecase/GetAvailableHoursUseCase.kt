@@ -6,9 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
 
-class GetAvailableHoursUseCase(
+class GetAvailableHoursUseCase @Inject constructor(
     private val sampleDataRepository: SampleDataRepository,
 ) {
     fun execute(): Flow<Int> = flow {

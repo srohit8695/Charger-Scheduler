@@ -13,9 +13,11 @@ import com.example.chargescheduler.R
 import com.example.chargescheduler.databinding.ActivityMainBinding
 import com.example.chargescheduler.domain.scheduler.ChargingSchedule
 import com.example.chargescheduler.presentation.viewmodel.ChargingViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val chargingViewModel: ChargingViewModel by viewModels()
